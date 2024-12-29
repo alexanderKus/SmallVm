@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"os"
-	"strconv"
 )
 
 const MEMORY_MAX int = 1<<16
@@ -66,7 +65,6 @@ const (
 
 func memRead(addr uint16) uint16 {
 	if addr == MR_KBSR {
-		panic("hello?")
 		if checkKey() {
 			b := make([]byte,1)
 			os.Stdin.Read(b)
@@ -84,6 +82,7 @@ func memWrite(addr uint16, val uint16) {
 }
 
 func checkKey() bool {
+	panic("hello?")
 	return true
 }
 
@@ -230,39 +229,42 @@ func main() {
 			reg[R_R7] = reg[R_PC]
 			switch instr & 0xFF {
 			case TRAP_GETC:
-				b := make([]byte, 1)
-				os.Stdin.Read(b)
-				reg[R_R0] = uint16(b[0])
+				var b byte 
+				fmt.Scanf("%c", &b)
+				reg[R_R0] = uint16(b)
+				updateFlags(R_R0)
 			case TRAP_OUT:
-				fmt.Print(strconv.FormatUint(uint64(reg[R_R0]), 10))
+				fmt.Print(string(rune(reg[R_R0])))
 			case TRAP_PUTS:
 				index := reg[R_R0]
 				c := memory[index]
 				for c > 0 {
-					fmt.Print(strconv.FormatUint(uint64(c),10))
+					s := string(rune(c))
+					fmt.Print(s)
 					index += 1
 					c = memory[index]
 				}
 			case TRAP_IN:
 				fmt.Printf("Enter a character: ")
-				b := make([]byte, 1)
-				os.Stdin.Read(b)
-				fmt.Print(strconv.FormatUint(uint64(b[0]),10))
-				reg[R_R0] = uint16(b[0])
+				var b byte 
+				fmt.Print(string(b))
+				reg[R_R0] = uint16(b)
 				updateFlags(R_R0)
 			case TRAP_PUTSP:
-				// NOTE: not sure if this is correct
 				index := reg[R_R0]
 				c := memory[index]
 				for c > 0 {
 					char1 := c & 0xFF
-					fmt.Print(strconv.FormatUint(uint64(char1),10))
+					s := string(rune(char1))
+					fmt.Print(s)
 					char2 := c >> 8
-					fmt.Print(strconv.FormatUint(uint64(char2),10))
+					s = string(rune(char2))
+					fmt.Print(s)
 					index += 1
+					c = memory[index]
 				}
 			case TRAP_HALT:
-				fmt.Println("HALLT")
+				fmt.Println("HALT")
 				running = false
 			}
 		//case OP_RES:
