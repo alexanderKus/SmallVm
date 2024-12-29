@@ -121,7 +121,6 @@ func updateFlags(r uint16) {
 }
 
 func main() {
-	/* Load arguments */
 	if len(os.Args) < 2 {
 		fmt.Fprintln(os.Stderr, "LC3 [image-file1] ...")
 		os.Exit(1)	
@@ -130,8 +129,6 @@ func main() {
 		if i == 0 { continue }
 		readImage(v)
 	}
-	// Set up
-
 	reg[R_COND] = FL_ZRO
 	const (
 		PC_START = 0x3000 /* Set the PC starting position. 0x3000 is the default*/
@@ -273,5 +270,4 @@ func main() {
 			panic("Bad Opcode")
 		}
 	}
-	// Shutdown
 }
